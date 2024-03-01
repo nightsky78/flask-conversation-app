@@ -1,0 +1,44 @@
+import boto3
+import json
+
+def invoke_claude(prompt, history):
+    # Update to include the conversation history in the prompt
+    full_prompt = f"{history}Human: {prompt}\n\nAssistant:"
+    bedrock = boto3.client(service_name="bedrock-runtime")
+    body = json.dumps({
+        "prompt": full_prompt,
+        "max_tokens_to_sample": 512,
+        "temperature": 0.8,
+        "top_p": 0.8,
+    })
+    
+    model_id = "anthropic.claude-v2:1"
+    response = bedrock.invoke_model(
+        body=body,
+        modelId=model_id,
+        accept="application/json",
+        contentType="application/json",
+    )
+    
+    response_body = json.loads(response['body'].read())
+    completion = response_body.get('completion')
+    
+    # Update the history to include the latest exchange
+    updated_history = f"{history}Human: {prompt}\n\nAssistant: {completion}\n\n"
+    return completion, updated_history
+
+def main():
+    print("Welcome to the Claude 2.1 Chatbot!")
+    history = ""  # Initialize an empty history
+    print("Type 'quit' to exit.")
+    
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == 'quit':
+            print("Chatbot: Goodbye! Feel free to come back anytime.")
+            break
+        response, history = invoke_claude(user_input, history)  # Pass and update the history
+        print(f"Claude: {response}")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Form Example</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    label, input, button {
+        font-size: 1.2rem; /* Adjust font size to make text larger */
+    }
+    input[type="text"], input[type="file"] {
+        height: 45px; /* Increase the height of text and file inputs */
+        margin-top: 0.5rem;
+    }
+    button {
+        padding: 10px 20px; /* Larger buttons */
+        margin-top: 0.5rem;
+    }
+    #more {
+        display: block;
+        margin-top: 20px;
+    }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    var counter = 1;
+    $("#more").click(function() {
+        if (counter < 10) { // Limit to 10 additional forms
+            var newForm = `<div class="form-group"><label for="instruction${counter}">Instruction:</label><input type="text" name="instruction${counter}" id="instruction${counter}" required class="form-control"><input type="file" name="file${counter}" accept=".pdf" required class="form-control"></div>`;
+            $("#formsContainer").append(newForm);
+            counter++;
+        }
+    });
+});
+</script>
+</head>
+<body>
+<div class="container mt-5">
+    <form action="/submit" method="post" enctype="multipart/form-data" id="dynamicForm">
+        <div id="formsContainer">
+            <div class="form-group">
+                <label for="instruction0">Instruction:</label>
+                <input type="text" name="instruction0" id="instruction0" required class="form-control">
+                <input type="file" name="file0" accept=".pdf" required class="form-control">
+            </div>
+        </div>
+        <button type="button" id="more" class="btn btn-primary">More</button>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+</body>
+</html>

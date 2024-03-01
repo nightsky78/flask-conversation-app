@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .conversation-container {
+            margin-bottom: 20px;
+        }
+        .prompt, .response {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            word-wrap: break-word;
+        }
+        .prompt {
+            background-color: #f0f0f0;
+        }
+        .response {
+            background-color: #d1e7dd;
+        }
+        form input[type="text"] {
+            width: calc(100% - 122px);
+            padding: 10px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        form input[type="submit"] {
+            padding: 10px 20px;
+            display: inline-block;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <h2>Conversation with LLM</h2>
+    <div id="conversation">
+        {% for entry in conversation %}
+            <div class="conversation-container">
+                <div class="prompt">{{ entry.prompt }}</div>
+                <div class="response">{{ entry.response }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    <form action="/continue_conversation" method="post">
+        <input type="text" name="user_input" required>
+        <input type="submit" value="Continue Conversation">
+    </form>
+    <br>
+    <button id="saveAsPdf">Save Conversation as PDF</button>
+
+    <script>
+        document.getElementById('saveAsPdf').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+        
+            doc.setFontSize(10); // Set the font size
+        
+            let yPos = 10; // Initial Y position
+            const pageHeight = doc.internal.pageSize.height; // Get the page height
+        
+            document.querySelectorAll('.conversation-container').forEach(function(container, index) {
+                const prompt = container.querySelector('.prompt').textContent;
+                const response = container.querySelector('.response').textContent;
+                
+                let text = `Prompt: ${prompt}\nResponse: ${response}\n\n`;
+                let lines = doc.splitTextToSize(text, 180); // Split text to ensure it fits the page width
+        
+                // Check if the current text block fits on the current page, add a new page if it doesn't
+                if (yPos + 10 + (lines.length * 6.5) > pageHeight) { // 6.5 is an approximate line height
+                    doc.addPage();
+                    yPos = 10; // Reset Y position for the new page
+                }
+        
+                doc.text(lines, 10, yPos);
+                yPos += lines.length * 6.5 + 5; // Update Y position for the next block of text
+            });
+        
+            doc.save('conversation.pdf');
+        });
+    </script>
+        
+    
+</body>
+</html>
