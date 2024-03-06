@@ -31,7 +31,7 @@ $(document).ready(function() {
     var counter = 1;
     $("#more").click(function() {
         if (counter < 10) { // Limit to 10 additional forms
-            var newForm = `<div class="form-group"><label for="instruction${counter}">Instruction:</label><input type="text" name="instruction${counter}" id="instruction${counter}" required class="form-control"><input type="file" name="file${counter}" accept=".pdf" required class="form-control"></div>`;
+            var newForm = `<div class="form-group"><label for="instruction${counter}">Instruction:</label><textarea name="instruction${counter}" id="instruction${counter}" required class="form-control" rows="4"></textarea><input type="file" name="file${counter}" accept=".pdf" required class="form-control"></div>`;
             $("#formsContainer").append(newForm);
             counter++;
         }
@@ -45,9 +45,9 @@ $(document).ready(function() {
         <div id="formsContainer">
             <div class="form-group">
                 <label for="instruction0">Instruction:</label>
-                <input type="text" name="instruction0" id="instruction0" required class="form-control">
+                <textarea name="instruction0" id="instruction0" required class="form-control" rows="4"></textarea>
                 <input type="file" name="file0" accept=".pdf" required class="form-control">
-            </div>
+            </div>            
         </div>
         <button type="button" id="more" class="btn btn-primary">More</button>
         <button type="submit" class="btn btn-success">Submit</button>

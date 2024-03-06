@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Conversation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,67 +24,36 @@
         .response {
             background-color: #d1e7dd;
         }
-        form input[type="text"] {
-            width: calc(100% - 122px);
-            padding: 10px;
-            margin-right: 10px;
-            display: inline-block;
-        }
-        form input[type="submit"] {
+        /* Ensure uniform button styling */
+        .action-button {
             padding: 10px 20px;
-            display: inline-block;
+            margin-top: 0.5rem;
+            font-size: 1.2rem; /* Adjust font size to match your design */
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <h2>Conversation with LLM</h2>
     <div id="conversation">
         {% for entry in conversation %}
             <div class="conversation-container">
-                <div class="prompt">{{ entry.prompt }}</div>
-                <div class="response">{{ entry.response }}</div>
+                <div class="prompt">{{ entry.prompt | safe }}</div>
+                <div class="response">{{ entry.response | safe }}</div>
             </div>
         {% endfor %}
     </div>
     <form action="/continue_conversation" method="post">
-        <input type="text" name="user_input" required>
-        <input type="submit" value="Continue Conversation">
+        <textarea name="user_input" required rows="4" cols="50" placeholder="Enter your message here..."></textarea>
+        <input type="submit" value="Continue Conversation" class="btn btn-primary action-button">
     </form>
+    
     <br>
-    <button id="saveAsPdf">Save Conversation as PDF</button>
-
-    <script>
-        document.getElementById('saveAsPdf').addEventListener('click', function () {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-        
-            doc.setFontSize(10); // Set the font size
-        
-            let yPos = 10; // Initial Y position
-            const pageHeight = doc.internal.pageSize.height; // Get the page height
-        
-            document.querySelectorAll('.conversation-container').forEach(function(container, index) {
-                const prompt = container.querySelector('.prompt').textContent;
-                const response = container.querySelector('.response').textContent;
-                
-                let text = `Prompt: ${prompt}\nResponse: ${response}\n\n`;
-                let lines = doc.splitTextToSize(text, 180); // Split text to ensure it fits the page width
-        
-                // Check if the current text block fits on the current page, add a new page if it doesn't
-                if (yPos + 10 + (lines.length * 6.5) > pageHeight) { // 6.5 is an approximate line height
-                    doc.addPage();
-                    yPos = 10; // Reset Y position for the new page
-                }
-        
-                doc.text(lines, 10, yPos);
-                yPos += lines.length * 6.5 + 5; // Update Y position for the next block of text
-            });
-        
-            doc.save('conversation.pdf');
-        });
-    </script>
-        
+    <!-- Back Button -->
+    <a href="/" class="btn btn-secondary action-button">Back</a>
+    <!-- Save as PDF Button -->
+    <button id="saveAsPdf" class="btn btn-success action-button">Save Conversation as PDF</button>
+    
+    <!-- Include your script here -->
     
 </body>
 </html>
