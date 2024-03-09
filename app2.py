@@ -6,6 +6,7 @@ import os
 import json
 import boto3
 from openai import OpenAI
+from botocore.config import Config
 
 app = Flask(__name__)
 app.secret_key = 'a_secure_and_persistent_secret_key'
@@ -15,7 +16,8 @@ app.config["SESSION_TYPE"] = "filesystem"  # Options include redis, memcached, f
 Session(app)
 
 def invoke_model_claude2(prompt_data, history_messages):
-    bedrock = boto3.client(service_name="bedrock-runtime")
+    config = Config(read_timeout=1000)
+    bedrock = boto3.client(service_name="bedrock-runtime", config=config)
     # Ensure history_messages is a list. If it's not, initialize as an empty list.
     if not isinstance(history_messages, list):
         history_messages = []  # Correctly initialize history_messages if it was not a list
@@ -131,7 +133,7 @@ def submit():
                     pdf_text += pytesseract.image_to_string(page)
 
                 # Append the instruction and its associated text to the combined_text string
-                combined_text += f"Document: {pdf_text}\n\Question for Document: {instruction}\n"
+                combined_text += f"My context: {pdf_text}\n\My Question for teh context: {instruction}\n"
 
                 # Clean up: remove the temporary file
                 os.remove(temp_pdf_path)
